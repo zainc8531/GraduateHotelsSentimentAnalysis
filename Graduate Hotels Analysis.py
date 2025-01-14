@@ -40,7 +40,6 @@ First we need to identify the emojis as they can affect the analysis. These two 
 
 """#### **Filtering out emojis**"""
 
-# 2. Import the packages we need
 import emoji
 import regex
 import matplotlib.pyplot as plt
@@ -59,10 +58,10 @@ def get_emojis(text):
 emoji_list = get_emojis(tweets.content[91])
 print(' '.join(e for e in emoji_list))
 
-# 4. Let's do that for all of our tweets and store the emojis in a new column called "emojis"
+
 tweets['emojis'] = tweets['content'].apply(get_emojis)
 
-# 6. Check if it worked
+
 display(tweets) # logical indexing: from tweets get rows 340,352
 
 """Using Regex to remove hashtags, links, and mentions that may affect the analysis as they are twitter specific"""
@@ -87,10 +86,9 @@ combined_pat = r'|'.join((pat1, pat2, pat3, pat4, pat5, pat6, pat7, pat8, pat9))
 # 4. Replace the patterns with an empty string
 tweets['stripped'] =  [re.sub(combined_pat, '', w) for w in tweets.content]
 
-# 5. might have double spaces now (because of empty string replacements above) - remove double empty spaces
+# 5. remove double empty spaces
 tweets['stripped'] = tweets.stripped.replace({' +':' '},regex=True)
 
-# 6. Print some tweets to check if it worked
 for i in range(0,10):
     print(tweets.stripped[i])
     print('\n')
@@ -104,7 +102,7 @@ First, we need to search through the tweets for certain topic words that may be 
 #### **Bag creations and counts**
 """
 
-# 1. Import required modules (in case not already imported)
+# 1. Import required modules
 import numpy as np
 import re
 
@@ -119,12 +117,12 @@ tweets['price'] = np.where(tweets.stripped.str.contains('(?:^|\W)(price|overpric
 tweets['keywords'] = np.where(tweets.stripped.str.contains('(?:^|\W)(local|collegiate culture|charm|nostalgic|friendly)(?:$|\W)',
     flags = re.IGNORECASE), 1, 0)
 
-#when I observed wifi, I noticed a few about something called hall pass. So I did a separate search.
+
 tweets['hallpass'] = np.where(tweets.stripped.str.contains('(?:^|\W)(hallpass|hall pass)(?:$|\W)',
     flags = re.IGNORECASE), 1, 0)
 
 
-# 4. How many tweets of each topic?
+
 print(f"Total {tweets['stripped'].count()}")
 print(f"Wifi {tweets['wifi'].sum()}")
 print(f"Room {tweets['room'].sum()}")
@@ -237,32 +235,32 @@ plt.show()
 
 """#**4. Sentiment Analysis Pre-Step**"""
 
-# 0. Run once to install the Vader Sentiment Classification Package
+# 0. Vader Sentiment Classification Package
 !pip install vaderSentiment
 
 """####**C_Score Calculation**"""
 
-# 1. Import the sentiment module (in case you haven't already done so)
+# 1. Import the sentiment module 
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-# 2. Import numpy (in case you have not already done so)
+# 2. Import numpy 
 import numpy as np
 
-# 3. Instantiate the sentiment analyzer (in case you haven't already done so)
+# 3. Instantiate the sentiment analyzer 
 analyser = SentimentIntensityAnalyzer()
 
-# 4. Now get the compound sentiment score for each tweet
-tweets['C_Score'] = np.nan # initialize empty comlumn in our tweets dataframe (empty = missing values)
-for index, row in tweets.iterrows():  # loop through all tweets (i.e., rows)
+
+tweets['C_Score'] = np.nan 
+for index, row in tweets.iterrows(): 
     tweets.loc[index, 'C_Score'] = analyser.polarity_scores(row['stripped'])['compound']
 
-# 5. Let's take a look!
+
 pd.set_option('display.max_colwidth', None)
 tweets[['stripped','C_Score']][0:1000]
 
 """#### **Tweet C_Score**"""
 
-# 1. import necessary modules (in case not already imported)
+
 import pandas as pd
 import numpy as np
 
@@ -280,17 +278,17 @@ print(f"Count netural tweets: {tweets[(tweets['wifi'] == 1)]['C_Score'].between(
 print(f"Count negative tweets: {sum(tweets[(tweets['wifi'] == 1)]['C_Score'] < -0.05)}")
 print(f"Total number of tweets: {tweets[(tweets['wifi'] == 1)]['C_Score'].count()}")
 
-# 1. import necessary modules (in case not already imported)
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# 2. Settings for seaborn plotting style
+
 sns.set(color_codes=True)
 
-# 3. Settings for seaborn plot sizes
+
 sns.set(rc={'figure.figsize':(5,5)})
 
-# 4. Create Histogram
+# Create Histogram
 ax = sns.histplot(tweets[(tweets['wifi'] == 1)]['C_Score'],
                   bins=10,
                   kde=False,
@@ -309,12 +307,12 @@ for index, row in tweets.iterrows():
     else :
         tweets.loc[index, 'Sentiment'] = "Neutral"
 
-# 3. Typecast as categorical variable (computationally more efficient)
+# 3. Typecast as categorical variable
 tweets['Sentiment'] = tweets['Sentiment'].astype("category")
 
 """####**Sentiment Distribution**"""
 
-# 1. Import necessary modules (in case not already imported)
+# 1. Import necessary modules
 import matplotlib.pyplot as plt
 
 # 2. Set font size
@@ -393,7 +391,7 @@ print(f"Count netural tweets: {tweets[(tweets['room'] == 1)]['C_Score'].between(
 print(f"Count negative tweets: {sum(tweets[(tweets['room'] == 1)]['C_Score'] < -0.05)}")
 print(f"Total number of tweets: {tweets[(tweets['room'] == 1)]['C_Score'].count()}")
 
-# 1. import necessary modules (in case not already imported)
+# 1. import necessary modules
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -412,7 +410,7 @@ ax.set(xlabel='Sentiment Distribution for Rooms', ylabel='Frequency')
 
 """####**Sentiment Distribution**"""
 
-# 1. Import necessary modules (in case not already imported)
+# 1. Import necessary modules 
 import matplotlib.pyplot as plt
 
 # 2. Set font size
@@ -489,7 +487,6 @@ print(f"Count netural tweets: {tweets[(tweets['food'] == 1)]['C_Score'].between(
 print(f"Count negative tweets: {sum(tweets[(tweets['food'] == 1)]['C_Score'] < -0.05)}")
 print(f"Total number of tweets: {tweets[(tweets['food'] == 1)]['C_Score'].count()}")
 
-# 1. import necessary modules (in case not already imported)
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -508,10 +505,10 @@ ax.set(xlabel='Sentiment Distribution for Food', ylabel='Frequency')
 
 """####**Sentiment Distribution**"""
 
-# 1. Import necessary modules (in case not already imported)
+
 import matplotlib.pyplot as plt
 
-# 2. Set font size
+
 plt.rcParams['font.size']=24
 
 # 3. Define figure
@@ -546,7 +543,7 @@ plt.show()
 
 """####**Common Words in Positive Tweets**"""
 
-# 1. Import module
+
 from wordcloud import WordCloud
 
 
@@ -564,7 +561,7 @@ plt.show()
 
 """####**Common Words in Negative Tweets**"""
 
-# 1. Import module
+
 from wordcloud import WordCloud
 
 
@@ -587,7 +584,7 @@ print(f"Count netural tweets: {tweets[(tweets['price'] == 1)]['C_Score'].between
 print(f"Count negative tweets: {sum(tweets[(tweets['price'] == 1)]['C_Score'] < -0.05)}")
 print(f"Total number of tweets: {tweets[(tweets['price'] == 1)]['C_Score'].count()}")
 
-# 1. import necessary modules (in case not already imported)
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -606,7 +603,7 @@ ax.set(xlabel='Sentiment Distribution for Price', ylabel='Frequency')
 
 """####**Sentiment Distribution**"""
 
-# 1. Import necessary modules (in case not already imported)
+# 1. Import necessary modules 
 import matplotlib.pyplot as plt
 
 # 2. Set font size
@@ -683,7 +680,7 @@ print(f"Count netural tweets: {tweets[(tweets['keywords'] == 1)]['C_Score'].betw
 print(f"Count negative tweets: {sum(tweets[(tweets['keywords'] == 1)]['C_Score'] < -0.05)}")
 print(f"Total number of tweets: {tweets[(tweets['keywords'] == 1)]['C_Score'].count()}")
 
-# 1. import necessary modules (in case not already imported)
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -702,7 +699,7 @@ ax.set(xlabel='Sentiment Distribution for keywords', ylabel='Frequency')
 
 """####**Sentiment Distribution**"""
 
-# 1. Import necessary modules (in case not already imported)
+
 import matplotlib.pyplot as plt
 
 # 2. Set font size
@@ -779,7 +776,7 @@ print(f"Count netural tweets: {tweets[(tweets['hallpass'] == 1)]['C_Score'].betw
 print(f"Count negative tweets: {sum(tweets[(tweets['hallpass'] == 1)]['C_Score'] < -0.05)}")
 print(f"Total number of tweets: {tweets[(tweets['hallpass'] == 1)]['C_Score'].count()}")
 
-# 1. import necessary modules (in case not already imported)
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -798,7 +795,7 @@ ax.set(xlabel='Sentiment Distribution for HallPass', ylabel='Frequency')
 
 """####**Sentiment Distribution**"""
 
-# 1. Import necessary modules (in case not already imported)
+
 import matplotlib.pyplot as plt
 
 # 2. Set font size
@@ -874,7 +871,7 @@ plt.show()
 
 !pip install bertopic[visualization]
 
-# Import libraries
+
 import numpy as np
 from bertopic import BERTopic
 
@@ -887,49 +884,48 @@ docs = tweets["stripped"].to_list()
  # 3. Fit model to data to predict topics
 topics, probabilities = model.fit_transform(docs)
 
-# Let's see how many tweets are in each discovered topic!
+
 model.get_topic_freq().head(20)
 
-# Get more details: The model even tries to give names to topics... well... sort of works... sort of...
+
 model.get_topic_info()
 
-# Find the words of a specific topic (and their probabilities of belonging to that topic)
+# Find the words of a specific topic
 model.get_topic(25)
 
-# You can even interactively explore topics
+
 model.visualize_topics()
 
-# A nice feature of BERTopic is that you can easily generate Barcharts of the most relevant words per topic
+
 model.visualize_barchart()
 
-# You can create an interactive heatmap
+
 model.visualize_heatmap()
 
 # Define sentence
 new_doc = "Had great food at the graduate hotel"
-# Feed it into the model
+
 model.transform([new_doc])
-# should find that belongs to topic 1 ([1], None)
+
 
 pd.DataFrame(model.find_topics("wifi"))
-# most relevant is with highest score (row 1, and then column, which corresponds to topic number).
+
 
 pd.DataFrame(model.find_topics("room"))
-# most relevant is with highest score (row 1, and then column, which corresponds to topic number).
+
 
 pd.DataFrame(model.find_topics("food"))
-# most relevant is with highest score (row 1, and then column, which corresponds to topic number).
+
 
 pd.DataFrame(model.find_topics("price"))
-# most relevant is with highest score (row 1, and then column, which corresponds to topic number).
+
 
 pd.DataFrame(model.find_topics("hallpass"))
-# most relevant is with highest score (row 1, and then column, which corresponds to topic number).
 
-# save model (we name the file "graduatetwees")
+
+
 model.save("graduatetweets")
 
-# load model (now we name the model "graduate_model")
 graduate_model = BERTopic.load("graduatetweets")
 
 # check loaded model
